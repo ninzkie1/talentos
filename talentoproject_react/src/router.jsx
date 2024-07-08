@@ -3,7 +3,10 @@ import Login from './views/Login'
 import Register from './views/Register'
 import DefaultLayout from './components/DefaultLayout'
 import GuestLayout from './components/GuestLayout'
-import Users from './views/Users'
+import Admin from './views/Admin'
+import AdminLayout from './components/AdminLayout'
+import Customer from './views/Customer'
+import Performer from './views/Performer'
 
 
 const router = createBrowserRouter ([
@@ -12,10 +15,26 @@ const router = createBrowserRouter ([
         element: <DefaultLayout />,
         children: [
            {
-                path: '/users',
-                element: <Users />
+                path: 'customer',
+                element: <Customer />
            },
+           {
+            path: 'performer',
+            element: <Performer />
+       },
         ]
+    },
+    {
+        path: '/',
+        element: <AdminLayout />,
+        children:[
+            {
+            
+                path: 'admin',
+                element: <Admin />
+               
+        },
+    ]
     },
     
     {
@@ -23,11 +42,11 @@ const router = createBrowserRouter ([
         element: <GuestLayout />,
         children: [
             {
-                path : '/login',
+                path : 'login',
                 element: <Login />
             },
             {
-                path : '/register',
+                path : 'register',
                 element: <Register />
             }
         ]

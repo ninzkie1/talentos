@@ -21,12 +21,12 @@ import { useStateContext } from "../context/contextprovider";
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
-export default function DefaultLayout() {
+export default function AdminLayout() {
     const { user, token, setToken } = useStateContext();
 
     const onLogout = (ev) => {
       ev.preventDefault();
-      setToken(null);
+      setToken(null);   
     };
   
     if (!token) {
