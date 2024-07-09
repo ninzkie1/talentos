@@ -30,7 +30,7 @@ export default function DefaultLayout() {
     };
   
     if (!token) {
-      return <Navigate to='/login' />;
+      return <Navigate to='login' />;
     }
 
     return(

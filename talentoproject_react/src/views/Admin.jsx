@@ -1,6 +1,5 @@
-
 export default function Admin(){
     return(
-        <div>Admin here</div>
+        <div>Welcome Admin!</div>
     )
 }

@@ -1,186 +1,146 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import React from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import {
+  Card,
+  Typography,
+  List,
+  ListItem,
+  ListItemPrefix,
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+} from "@material-tailwind/react";
+import {
+  PresentationChartBarIcon,
+  ShoppingBagIcon,
+  UserCircleIcon,
+  PowerIcon,
+} from "@heroicons/react/24/solid";
+import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useStateContext } from "../context/contextprovider";
 
-
-
-  const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Team', href: '#', current: false },
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Calendar', href: '#', current: false },
-    { name: 'Reports', href: '#', current: false },
-  ]
-  const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#', action: 'signout' },
-  ]
-  
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-  }
 export default function AdminLayout() {
-    const { user, token, setToken } = useStateContext();
+  const { user, token, setToken } = useStateContext();
+  const [open, setOpen] = React.useState(0);
+  const navigate = useNavigate(); // Hook for programmatic navigation
 
-    const onLogout = (ev) => {
-      ev.preventDefault();
-      setToken(null);   
-    };
-  
-    if (!token) {
-      return <Navigate to='/login' />;
-    }
+  const handleOpen = (value) => {
+    setOpen(open === value ? 0 : value);
+  };
 
-    return(
-        <div>
-             <div className="min-h-full">
-        <Disclosure as="nav" className="bg-gray-800">
-          {({ open }) => (
-            <>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <img
-                        className="h-8 w-8"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                        alt="Your Company"
-                      />
-                    </div>
-                    <div className="hidden md:block">
-                      <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
-                          <a
-                            key={item.name}
-                            href={item.href}
-                            className={classNames(
-                              item.current
-                                ? 'bg-gray-900 text-white'
-                                : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                              'rounded-md px-3 py-2 text-sm font-medium',
-                            )}
-                            aria-current={item.current ? 'page' : undefined}
-                          >
-                            {item.name}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="hidden md:block">
-                    <div className="ml-4 flex items-center md:ml-6">
-                      <button
-                        type="button"
-                        className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                      >
-                        <span className="absolute -inset-1.5" />
-                        <span className="sr-only">View notifications</span>
-                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
+  const onLogout = (ev) => {
+    ev.preventDefault();
+    setToken(null);
+  };
 
-                      {/* Profile dropdown */}
-                      <Menu as="div" className="relative ml-3">
-                        <div>
-                          <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                            <span className="absolute -inset-1.5" />
-                            <span className="sr-only">Open user menu</span>
-                            <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
-                          </MenuButton>
-                        </div>
-                        <MenuItems
-                        transition
-                        className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-                      >
-                        {userNavigation.map((item) => (
-                          <MenuItem key={item.name}>
-                            {({ active }) => (
-                              <a
-                                href={item.href}
-                                onClick={item.action === 'signout' ? onLogout : undefined}
-                                className={classNames(
-                                  active ? 'bg-gray-100' : '',
-                                  'block px-4 py-2 text-sm text-gray-700',
-                                )}
-                              >
-                                {item.name}
-                              </a>
-                            )}
-                          </MenuItem>
-                        ))}
-                      </MenuItems>
-                      </Menu>
-                    </div>
-                  </div>
-                  <div className="-mr-2 flex md:hidden">
-                    {/* Mobile menu button */}
-                    <DisclosureButton className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                      <span className="absolute -inset-0.5" />
-                      <span className="sr-only">Open main menu</span>
-                      {open ? (
-                        <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                      ) : (
-                        <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                      )}
-                    </DisclosureButton>
-                  </div>
-                </div>
-              </div>
+  const navigateToUsers = () => {
+    // Programmatic navigation to /users
+    navigate("/users");
+  };
 
-              <DisclosurePanel className="md:hidden">
-                <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-                  {navigation.map((item) => (
-                    <DisclosureButton
-                      key={item.name}
-                      as="a"
-                      href={item.href}
-                      className={classNames(
-                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'block rounded-md px-3 py-2 text-base font-medium',
-                      )}
-                      aria-current={item.current ? 'page' : undefined}
-                    >
-                      {item.name}
-                    </DisclosureButton>
-                  ))}
-                </div>
-                <div className="border-t border-gray-700 pb-3 pt-4">
-                  <div className="flex items-center px-5">
-                    <div className="flex-shrink-0">
-                      <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
-                    </div>
-                    <div className="ml-3">
-                      <div className="text-base font-medium leading-none text-white">{user.name}</div>
-                      <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
-                    </div>
-                    <button
-                      type="button"
-                      className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                    >
-                      <span className="absolute -inset-1.5" />
-                      <span className="sr-only">View notifications</span>
-                      <BellIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-                  </div>
-                  <div className="mt-3 space-y-1 px-2">
-                    {userNavigation.map((item) => (
-                      <DisclosureButton
-                        key={item.name}
-                        as="a"
-                        href={item.href}
-                        className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                      >
-                        {item.name}
-                      </DisclosureButton>
-                    ))}
-                  </div>
-                </div>
-              </DisclosurePanel>
-            </>
-          )}
-        </Disclosure>
+  const navigateToReports = () => {
+    // Programmatic navigation to /reports
+    navigate("/reports");
+  };
 
+  if (!token) {
+    return <Navigate to='login' />;
+  }
+
+  return (
+    <div className="flex min-h-full">
+      <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 bg-gray-200">
+        <div className="mb-2 p-4">
+          <Typography variant="h5" color="blue-gray">
+            Sidebar
+          </Typography>
+        </div>
+        <List>
+          <Accordion
+            open={open === 1}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 1 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 1}>
+              <AccordionHeader onClick={() => handleOpen(1)} className={`border-b-0 p-3 ${open === 1 ? 'bg-black text-white' : 'hover:bg-gray-300'}`}>
+                <ListItemPrefix>
+                  <PresentationChartBarIcon className="h-5 w-5" />
+                </ListItemPrefix>
+                <Typography color="blue-gray" className="mr-auto font-normal">
+                  Dashboard
+                </Typography>
+              </AccordionHeader>
+            </ListItem>
+            {open === 1 && (
+              <AccordionBody className="py-1">
+                <List className="p-0">
+                  <ListItem onClick={navigateToReports}>
+                    <ListItemPrefix>
+                      <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                    </ListItemPrefix>
+                    Reporting
+                  </ListItem>
+                </List>
+              </AccordionBody>
+            )}
+          </Accordion>
+          <Accordion
+            open={open === 2}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 2 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 2}>
+              <AccordionHeader onClick={() => handleOpen(2)} className={`border-b-0 p-3 ${open === 2 ? 'bg-black text-white' : 'hover:bg-gray-300'}`}>
+                <ListItemPrefix>
+                  <ShoppingBagIcon className="h-5 w-5" />
+                </ListItemPrefix>
+                <Typography color="blue-gray" className="mr-auto font-normal">
+                  Bookings
+                </Typography>
+              </AccordionHeader>
+            </ListItem>
+            {open === 2 && (
+              <AccordionBody className="py-1">
+                <List className="p-0">
+                  <ListItem>
+                    <ListItemPrefix>
+                      <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                    </ListItemPrefix>
+                    Orders
+                  </ListItem>
+                  <ListItem>
+                    <ListItemPrefix>
+                      <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                    </ListItemPrefix>
+                    Products
+                  </ListItem>
+                </List>
+              </AccordionBody>
+            )}
+          </Accordion>
+          <ListItem className={`p-3 ${open === 3 ? 'bg-black text-white' : 'hover:bg-gray-300'}`} onClick={navigateToUsers}>
+            <ListItemPrefix>
+              <UserCircleIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Users
+          </ListItem>
+          <ListItem onClick={onLogout} className="hover:bg-gray-300">
+            <ListItemPrefix>
+              <PowerIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Log Out
+          </ListItem>
+        </List>
+      </Card>
+      <div className="flex-1">
         <header className="bg-white shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
@@ -189,8 +149,8 @@ export default function AdminLayout() {
         <main>
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{/* Your content */}</div>
         </main>
+        <Outlet />
       </div>
-            <Outlet/>
-        </div>
-    )
+    </div>
+  );
 }
