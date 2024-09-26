@@ -1,40 +1,89 @@
 <?php
-// CommentController.php
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
-
-class CommentController extends Controller
+class CustomerController extends Controller
 {
-    
-// CommentController.php
-public function store(Request $request, $postId) {
-    // Validate incoming request
-    $validated = $request->validate([
-        'user_id' => 'required|integer',
-        'content' => 'required|string',
-    ]);
-
-    // Create a new comment
-    $comment = Comment::create([
-        'post_id' => $postId,
-        'user_id' => $validated['user_id'],
-        'content' => $validated['content'],
-    ]);
-
-    return response()->json($comment, 201);
-}
-
-
-
-    
-
-    public function index($postId)
+    public function index()
     {
-        $comments = Comment::where('post_id', $postId)->with('user')->get();
-        return response()->json($comments);
+        // Fetch all posts from the database and return as JSON
+        $posts = Post::all()->map(function ($post) {
+            // Ensure talents is decoded to array before returning to the frontend
+            $post->talents = json_decode($post->talents, true);
+            $post->comments = $post->comments->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'content' => $comment->content,
+                    'created_at' => $comment->created_at,
+                    // Add other fields as needed
+                ];
+            });
+            return $post;
+        });
+        
+
+        return response()->json($posts);
+    }
+
+    public function store(Request $request)
+    {
+        // Validate the incoming request
+        $validatedData = $request->validate([
+            'clientName' => 'required|string|max:255',
+            'eventName' => 'required|string|max:255',
+            'startTime' => 'required',
+            'endTime' => 'required',
+            'description' => 'required|string',
+            'talents' => 'required|array',
+        ]);
+
+        // Save the post to the database
+        $post = Post::create([
+            'client_name' => $validatedData['clientName'],
+            'event_name' => $validatedData['eventName'],
+            'start_time' => $validatedData['startTime'],
+            'end_time' => $validatedData['endTime'],
+            'description' => $validatedData['description'],
+            'talents' => json_encode($validatedData['talents']), // Save talents as a JSON string
+        ]);
+
+        return response()->json($post, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validate the incoming request
+        $validatedData = $request->validate([
+            'clientName' => 'required|string|max:255',
+            'eventName' => 'required|string|max:255',
+            'startTime' => 'required',
+            'endTime' => 'required',
+            'description' => 'required|string',
+            'talents' => 'required|array',
+        ]);
+
+        // Find and update the post
+        $post = Post::findOrFail($id);
+        $post->update([
+            'client_name' => $validatedData['clientName'],
+            'event_name' => $validatedData['eventName'],
+            'start_time' => $validatedData['startTime'],
+            'end_time' => $validatedData['endTime'],
+            'description' => $validatedData['description'],
+            'talents' => json_encode($validatedData['talents']), // Save talents as a JSON string
+        ]);
+
+        return response()->json($post, 200);
+    }
+
+    public function destroy($id)
+    {
+        // Find and delete the post
+        $post = Post::findOrFail($id);
+        $post->delete();
+
+        return response()->json(null, 204); // Return 204 No Content after deletion
     }
 }
